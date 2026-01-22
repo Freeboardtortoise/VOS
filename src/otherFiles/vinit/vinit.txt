@@ -1,0 +1,8 @@
+write hello word from the init program
+write running the main shell
+write running vshell
+run /bin/vshell
+write trying to run /bin/sh sh
+run /bin/sh sh
+write trying to run /bin/sh
+run /bin/sh

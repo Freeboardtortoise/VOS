@@ -1,0 +1,10 @@
+#!/bin/sh
+# Mount pseudo-filesystems
+mount -t proc none /proc
+mount -t sysfs none /sys
+
+# Mount root partition (adjust to your device)
+mount -o rw /dev/sdc2 /newroot
+
+# Switch to the real root and execute init
+exec switch_root / /sbin/init

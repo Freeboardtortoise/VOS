@@ -1,0 +1,11 @@
+config DAG_FS
+	tristate "The Graph Based File System"
+	select BUFFER_HEAD
+	select JBD2
+	select CRC16
+	select CRC32
+	select FS_IOMAP
+	help
+		thes is as Graph based file system by Freeboardtortoise that uses a map rather than a tree
+
+		nodes instead of files and so on...
