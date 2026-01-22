@@ -18,74 +18,14 @@ module main
 import freeboardtortoise.vcurses
 import os
 
-fn run_command(cmd string,args []string) {
-    // In a process management library, you would specify 'inherit'
-    // The exact V syntax would look something like this, using a builder pattern
-    // (Note: this is an illustrative example based on common library designs, check official V docs for exact API)
 
-    /*
-    process := os.Cmd{
-        path: cmd,
-        args: args,
-        stdin: os.Stdio.inherit(), // Explicitly inherit parent's stdin
-        stdout: os.Stdio.inherit(),
-        stderr: os.Stdio.inherit(),
-    }
-    process.run()
-    */
-}
-
-
-struct C.termios {
-    c_iflag u32
-    c_oflag u32
-    c_cflag u32
-    c_lflag u32
-    c_cc [32]byte
-    c_ispeed u32
-    c_ospeed u32
-}
-
-
-fn C.tcgetattr(fd int, term &Termios) int
-fn C.tcsetattr(fd int, when int, term &Termios) int
-
-const icanon = 0x2
-const echo = 0x8
-const tcsanow = 0
-const ixon = 0x200
-const icrnl = 0x100
-const opost = 0x1
-const vmin = 6
-const vtime = 5
-
-fn raw_on() C.termios {
-	mut orig := C.termios{}
-	C.tcgetattr(0, &orig)
-
-	mut raw := orig
-	raw.c_lflag &= ~(icanon | echo)
-	raw.c_iflag &= ~(ixon | icrnl)
-	raw.c_oflag &= ~opost
-	raw.c_cc[vmin] = 1
-	raw.c_cc[vtime] = 0
-
-	C.tcsetattr(0, tcsanow, &raw)
-	return orig
-}
-
-fn raw_off(orig C.termios) {
-	C.tcsetattr(0, tcsanow, &orig)
-}
 
 fn main() {
-	mut thing := raw_on()
 
 	mut screen := vcurses.initialise()
 	defer {
 		screen.clear()
-		vcurses.uninit()
-		raw_off(thing)
+		vcurses.uninit(screen)
 	} // ensure cleanup
 
 	screen.clear()
@@ -126,9 +66,7 @@ fn main() {
 				current_cursor_x = prompt.len + 1
 				buffer.move_cursor(vcurses.Pos{current_cursor_x, current_cursor_y})
 				// doing some shenanigans
-				raw_off(thing)
 				os.system(current_command)
-				thing = raw_on()
 				insert_mode = false
 				current_command = ""
 			} else if key == "\b" || key == "\177" {
