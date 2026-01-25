@@ -17,6 +17,7 @@ module main
 
 import freeboardtortoise.vcurses
 import os
+import strings
 
 
 
@@ -35,11 +36,12 @@ fn main() {
 	// data
 	prompt := "Vshel user$ "
 	// input data
-	start_cursor_y := 5
+	start_cursor_y := buffer.size().height - 2
+	output_cursor_y := 5
 	mut current_cursor_x := 0
 	mut current_cursor_y := start_cursor_y
-	current_cursor_y += 1
-	current_cursor_x = prompt.len
+	current_cursor_x = 1
+	last_command_len := 0
 
 	mut current_command := ""
 	for done == false {
@@ -52,8 +54,9 @@ fn main() {
 		else {
 			buffer.addstr('mode: __normal__', vcurses.Pos{1,3}, ['bright_white', 'black', 'bold'])
 		}
-		buffer.move_cursor(vcurses.Pos{0,current_cursor_y})
-		buffer.write(prompt, ['bright_white', 'black', 'bold'])
+		buffer.move_cursor(vcurses.Pos{0,start_cursor_y})
+		current_cursor_y = start_cursor_y
+		buffer.write(":",["blue", "black"])
 		screen.show(buffer)
 		key := screen.getch()
 		
@@ -62,9 +65,12 @@ fn main() {
 		// keyboard modes
 		if insert_mode == true {
 			if key == "\r"  || key ==  "\n" {
-				current_cursor_y += 1
-				current_cursor_x = prompt.len + 1
-				buffer.move_cursor(vcurses.Pos{current_cursor_x, current_cursor_y})
+				buffer.move_cursor(vcurses.Pos{1, start_cursor_y})
+				buffer.write("${strings.repeat(' '.bytes()[0], current_command.len + 1)}", ["",""])
+				current_cursor_y = output_cursor_y
+				current_cursor_x = 1
+				screen.move_cursor(vcurses.Pos{current_cursor_x, output_cursor_y})
+				screen.write("", ["",""])
 				// doing some shenanigans
 				os.system(current_command)
 				insert_mode = false
@@ -72,7 +78,7 @@ fn main() {
 			} else if key == "\b" || key == "\177" {
 				if current_command.len > 0 {
 					current_command = current_command[..current_command.len-1]
-					buffer.addstr(" ", vcurses.Pos{current_cursor_x,current_cursor_y}, ['bright_white', 'black', 'bold'])
+					buffer.addstr(" ", vcurses.Pos{current_cursor_x,current_cursor_y}, ['', '', 'bold'])
 					buffer.move_cursor(vcurses.Pos{current_cursor_x,current_cursor_y})
 					current_cursor_x -= 1
 				}
@@ -80,7 +86,7 @@ fn main() {
 			} else {
 				current_command = current_command + key
 				current_cursor_x += 1
-				buffer.addstr(key,vcurses.Pos{current_cursor_x, current_cursor_y}, ['bright_white', 'black', 'bold'])
+				buffer.addstr(key,vcurses.Pos{current_cursor_x, current_cursor_y}, ["blue", "black"])
 			}
 		} else {
 			if key == "i"{
@@ -95,6 +101,7 @@ fn main() {
 			}
 			if key == "l" {
 				buffer.clear()
+				screen.refresh()
 				current_cursor_y = start_cursor_y
 			}
 		}
