@@ -28,11 +28,7 @@ mkdir -p build/output
 set -e
 
 # adding the options for the command line args
-if [ $# -gt 0 ]; then
-	echo "too many args have been provided for the compile script"
-	echo "usage: ./compile.sh <make an iso file y or n>"
-	exit 1
-fi
+
 
 if mountpoint -q "mnt"; then
 	echo " thing is mounted"
@@ -222,9 +218,6 @@ echo "install grub"
 
 sudo mkdir -p mnt/boot/grub
 sudo mkdir -p mnt/boot/efi
-sudo cp boot/bzImage mnt/boot/
-sudo cp boot/grub.cfg mnt/boot/grub/
-
 if  get_cached_boot ; then
 	echo "loaded cached boot data"
 else 
@@ -239,13 +232,28 @@ sudo grub-install \
 
 echo "caching boot stuff"
 cache_boot
+if [ $1 = "serial" ]; then
+	sudo cp boot/grub.cfg mnt/boot/grub/grub.cfg
+else 
+	sudo cp boot/dirboot.cfg mnt/boot/grub/grub.cfg
+fi
+
+sudo cp boot/bzImage mnt/boot/
+
+
 
 echo "BIOS Boot"
 
-qemu-system-x86_64 \
-  -m 1024 \
-  -drive file=rootfs.img,format=raw \
-  -serial stdio
+if [ $1 = "serial" ]; then
+	qemu-system-x86_64 \
+  	-m 1024 \
+  	-drive file=rootfs.img,format=raw \
+  	-serial stdio
+else
+	qemu-system-x86_64 \
+  	-m 1024 \
+  	-drive file=rootfs.img,format=raw
+fi
 
 echo "a nother boot option"
 qemu-system-x86_64 \
