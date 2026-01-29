@@ -72,7 +72,9 @@ fn main() {
 				screen.move_cursor(vcurses.Pos{current_cursor_x, output_cursor_y})
 				screen.write("", ["",""])
 				// doing some shenanigans
+				screen.pause_raw()
 				os.system(current_command)
+				screen.restart_raw()
 				insert_mode = false
 				current_command = ""
 			} else if key == "\b" || key == "\177" {
