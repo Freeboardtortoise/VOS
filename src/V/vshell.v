@@ -19,10 +19,36 @@ import freeboardtortoise.vcurses
 import os
 import strings
 
+import json
+
+struct Config {
+pub:
+	insert string = "i"
+	history string = "h"
+	exit string = "q"
+	save string = "s"
+	clear string = "l"
+}
+
+
+fn load_config(filen string) Config {
+	// file := os.open(filen) or {panic("error  opening config file")}
+	file_contents := os.read_file(filen) or {panic("error oppening file")}
+	cfg := json.decode(Config, file_contents) or {panic("error in decode of json config file")}
+	// insert := cfg[name]["insert"]
+	//history := cfg[name]["history"]
+	//exit := cfg[name]["exit"]
+	//save := cfg[name]["save"]
+	//clear := cfg[name]["clear"]
+	//return Config{insert: insert,history:history,exit:exit,save:save,clear:clear}
+	return cfg
+}
+
 
 
 fn main() {
 
+	cfg := load_config("src/V/config.json")
 	mut screen := vcurses.initialise()
 	defer {
 		screen.clear()
@@ -91,17 +117,14 @@ fn main() {
 				buffer.addstr(key,vcurses.Pos{current_cursor_x, current_cursor_y}, ["blue", "black"])
 			}
 		} else {
-			if key == "i"{
+			if key == cfg.insert{
 				insert_mode = true
 				//insert mode data things
 			}
-			if key == "e" {
-				insert_mode = false
-			}
-			if key == "q" {
+			if key == cfg.exit {
 				done = true
 			}
-			if key == "l" {
+			if key == cfg.clear {
 				buffer.clear()
 				screen.refresh()
 				current_cursor_y = start_cursor_y
