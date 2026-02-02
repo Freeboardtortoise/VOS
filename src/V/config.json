@@ -1,7 +1,10 @@
 {
-    "insert": "i",
-    "history": "h",
-    "exit":"q",
-    "save": "s",
-    "clear": "l"
+    "keybinds" : {
+        "insert": "i",
+        "history": "h",
+        "exit":"q",
+        "save": "s",
+        "clear": "l"
+    },
+    "tutorial": true
 }

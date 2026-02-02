@@ -21,13 +21,18 @@ import strings
 
 import json
 
-struct Config {
+struct Keybinds {
 pub:
 	insert string = "i"
 	history string = "h"
 	exit string = "q"
 	save string = "s"
 	clear string = "l"
+}
+
+struct Config {
+	keybinds Keybinds
+	tutorial bool
 }
 
 
@@ -45,6 +50,16 @@ fn load_config(filen string) Config {
 }
 
 
+fn show_slide(mut screen vcurses.Screen, text string, attribs []string) vcurses.Screen{
+	mut buffer := vcurses.Buffer.new("tempBuffer")
+	buffer.addstr(text, vcurses.Pos{0,0}, attribs)
+	screen.show(buffer)
+	_ := screen.getch()
+	screen.clear()
+	screen.refresh()
+	return screen
+	
+}
 
 fn main() {
 
@@ -68,6 +83,22 @@ fn main() {
 	mut current_cursor_y := start_cursor_y
 	current_cursor_x = 1
 	last_command_len := 0
+
+	if cfg.tutorial == true {
+		// tutorial instructions
+		show_slide(mut screen, "wellcome to vshell.... the shell designed for optimal efficiency... this is the tutorial for new users... press any key to continue to the next slide at any point", ["",""])
+		// modes
+		show_slide(mut screen, "Vshell is mutch like vim in the way that there are modes for instance: \n\r Insert mode \n\r Normal mode", ["",""])
+		// keybinds
+		buffer.clear()
+		show_slide(mut screen, "to enter the insert mode: you must press the ${cfg.keybinds.insert} button", ["",""])
+		show_slide(mut screen, "to exit the insert mode: you must run a command and press enter", ["",""])
+		show_slide(mut screen, "to clear the screen: press the ${cfg.keybinds.clear} key while in normal mode", ["",""])
+
+		buffer.clear()
+		screen.refresh()
+		
+	}
 
 	mut current_command := ""
 	for done == false {
@@ -117,14 +148,14 @@ fn main() {
 				buffer.addstr(key,vcurses.Pos{current_cursor_x, current_cursor_y}, ["blue", "black"])
 			}
 		} else {
-			if key == cfg.insert{
+			if key == cfg.keybinds.insert{
 				insert_mode = true
 				//insert mode data things
 			}
-			if key == cfg.exit {
+			if key == cfg.keybinds.exit {
 				done = true
 			}
-			if key == cfg.clear {
+			if key == cfg.keybinds.clear {
 				buffer.clear()
 				screen.refresh()
 				current_cursor_y = start_cursor_y
