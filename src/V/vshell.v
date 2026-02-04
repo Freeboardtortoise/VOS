@@ -18,6 +18,7 @@ module main
 import freeboardtortoise.vcurses
 import os
 import strings
+import time
 
 import json
 
@@ -49,6 +50,23 @@ fn load_config(filen string) Config {
 	return cfg
 }
 
+
+fn save_command_to_history(file_path string, command string) {
+	if os.exists(file_path) {
+		// pass... the file is already there
+	} else {
+		os.create(file_path) or {panic("panic failed to create file")}
+	}
+	splitter := ":::::>>>>>"
+	mut file := os.open_append(file_path) or {panic("error oppening file for appending")}
+	file.writeln("${time.now()}${splitter}${command}") or {panic("error writing to file")}
+	file.close()
+}
+//fn get_histroy(file_path string, index int) string{
+//	splitter := ":::::>>>>>"
+//	histroy := os.read_lines(file_path) or {panic("error reading file")}
+//	return history[index].split(splitter)[1]
+//}
 
 fn show_slide(mut screen vcurses.Screen, text string, attribs []string) vcurses.Screen{
 	mut buffer := vcurses.Buffer.new("tempBuffer")
@@ -133,6 +151,7 @@ fn main() {
 				os.system(current_command)
 				screen.restart_raw()
 				insert_mode = false
+				save_command_to_history("commands.txt",current_command)
 				current_command = ""
 			} else if key == "\b" || key == "\177" {
 				if current_command.len > 0 {

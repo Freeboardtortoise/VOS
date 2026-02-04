@@ -6,5 +6,5 @@
         "save": "s",
         "clear": "l"
     },
-    "tutorial": true
+    "tutorial": false
 }
