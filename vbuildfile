@@ -1,0 +1,4 @@
+compile V src/V/vshell.v vshell static
+compile C src/C/init.c build/working/init
+
+mv

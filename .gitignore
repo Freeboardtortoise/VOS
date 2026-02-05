@@ -3,3 +3,5 @@ linux/
 
 commands.txt
 .gitignore
+
+Makefile
