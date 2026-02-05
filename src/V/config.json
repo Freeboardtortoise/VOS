@@ -4,7 +4,9 @@
         "history": "h",
         "exit":"q",
         "save": "s",
-        "clear": "l"
+        "clear": "l",
+        "moveup": "h",
+        "movedown": "t"
     },
     "tutorial": false
 }

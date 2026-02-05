@@ -29,6 +29,8 @@ pub:
 	exit string = "q"
 	save string = "s"
 	clear string = "l"
+	moveup string = "h"
+	movedown string = "t"
 }
 
 struct Config {
@@ -62,11 +64,20 @@ fn save_command_to_history(file_path string, command string) {
 	file.writeln("${time.now()}${splitter}${command}") or {panic("error writing to file")}
 	file.close()
 }
-//fn get_histroy(file_path string, index int) string{
-//	splitter := ":::::>>>>>"
-//	histroy := os.read_lines(file_path) or {panic("error reading file")}
-//	return history[index].split(splitter)[1]
-//}
+fn get_histroy(file_path string, index int) string{
+	splitter := ":::::>>>>>"
+	history := os.read_lines(file_path) or {panic("error reading file")}
+	return history[index].split(splitter)[1]
+}
+fn get_history_len(file_path string) int {
+	mut len := 0
+	splitter := ":::::>>>>>"
+	history := os.read_lines(file_path) or {panic("error reading file")}
+	for line in history{
+		len = len + 1
+	}
+	return len
+}
 
 fn show_slide(mut screen vcurses.Screen, text string, attribs []string) vcurses.Screen{
 	mut buffer := vcurses.Buffer.new("tempBuffer")
@@ -80,6 +91,8 @@ fn show_slide(mut screen vcurses.Screen, text string, attribs []string) vcurses.
 }
 
 fn main() {
+	history_file := "commands.txt"
+
 
 	cfg := load_config("src/V/config.json")
 	mut screen := vcurses.initialise()
@@ -91,6 +104,7 @@ fn main() {
 	screen.clear()
 	mut buffer := vcurses.Buffer.new('buffer 1')
 	mut insert_mode := false
+	mut history_mode := false
 	mut done := false
 	// data
 	prompt := "Vshel user$ "
@@ -101,6 +115,7 @@ fn main() {
 	mut current_cursor_y := start_cursor_y
 	current_cursor_x = 1
 	last_command_len := 0
+	mut current_history_intent := 0
 
 	if cfg.tutorial == true {
 		// tutorial instructions
@@ -151,7 +166,7 @@ fn main() {
 				os.system(current_command)
 				screen.restart_raw()
 				insert_mode = false
-				save_command_to_history("commands.txt",current_command)
+				save_command_to_history(history_file,current_command)
 				current_command = ""
 			} else if key == "\b" || key == "\177" {
 				if current_command.len > 0 {
@@ -166,7 +181,26 @@ fn main() {
 				current_cursor_x += 1
 				buffer.addstr(key,vcurses.Pos{current_cursor_x, current_cursor_y}, ["blue", "black"])
 			}
-		} else {
+		} else if history_mode == true {
+			current_command = get_histroy(history_file, current_history_intent)
+			buffer.write("${strings.repeat(' '.bytes()[0], current_command.len + 1)}", ["",""])
+			if key == cfg.keybinds.moveup {
+				current_history_intent -= 1
+				if current_history_intent < 0 {
+					current_history_intent = 0
+				}
+			} if key == cfg.keybinds.movedown {
+				current_history_intent += 1
+				if current_history_intent >= get_history_len(history_file) {
+					current_history_intent = get_history_len(history_file) - 1
+				}
+			} if key == cfg.keybinds.insert {
+				history_mode = false
+				insert_mode = true
+			}
+			buffer.addstr(current_command,vcurses.Pos{3, start_cursor_y}, ["blue", "black"])
+		
+		 } else {
 			if key == cfg.keybinds.insert{
 				insert_mode = true
 				//insert mode data things
@@ -178,6 +212,12 @@ fn main() {
 				buffer.clear()
 				screen.refresh()
 				current_cursor_y = start_cursor_y
+			}
+			if key == cfg.keybinds.history {
+				// history mode for getting past commands and re-running them
+				history_mode = true
+				insert_mode = false
+				current_history_intent = get_history_len(history_file) - 1
 			}
 		}
 	}
