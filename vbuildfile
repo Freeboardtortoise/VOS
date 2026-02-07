@@ -1,4 +1,58 @@
-compile V src/V/vshell.v vshell static
-compile C src/C/init.c build/working/init
+section vbuild>>                           ::::section start for vbuild
+create dir build/working
 
-mv
+write 10 compiling V code
+
+compile V src/V/vshell.v build/working/vshell static
+
+section cbuild>>                           ::::section start for cbuild
+write 10 compiling C code
+compile C src/c/init.c build/working/init not static
+write 10 done
+
+write 10 making the directories
+section createDirs>>                       ::::Section start for createDirs
+create dir mnt/bin
+create dir mnt/lib
+create dir mnt/sbin
+create dir mnt/sys
+create dir mnt/dev
+create dir mnt/proc
+create dir mnt/usr
+create dir mnt/home
+create dir mnt/etc
+create dir mnt/tmp
+
+
+section cleanRootfs>>                      ::::section start for cleanRootfs
+run sudo umount mnt -l
+run rm -rf mnt
+
+section createRootfs>>                     ::::section start for createRootfs
+
+
+write 10 started qemu image create
+run qemu-img create -f raw rootfs.img 10G
+
+
+write 10 started partitioning
+run parted rootfs.img --script mklabel gpt
+run parted rootfs.img --script mkpart BIOS_BIOS_GRUB 1MiB 2MiB
+run parted rootfs.img --script mkpart ESP fat32 2MiB 202MiB
+run parted rootfs.img --script mkpart primary ext4 202MiB 100%
+run parted rootfs.img --script set 2 boot on # ESP boot flag
+run parted rootfs.img --script set 1 boot on
+run parted rootfs.img --script set 1 bios_grub on
+
+write 10 other stuff required
+run export LOOPDEV=$(sudo losetup --show -fP rootfs.img)
+run EFI_PART="${LOOPDEV}p2"
+run ROOT_PART="${LOOPDEV}p3"
+run sudo mkfs.vfat $EFI_PART
+run sudo mkfs.ext4 $ROOT_PART
+
+section mountRootfs                       :::::section start for mountRootfs
+run mkdir -p mnt
+run sudo mount $ROOT_PART mnt
+run sudo mkdir -p mnt/boot/efi
+run sudo mount $EFI_PART mnt/boot/efi
