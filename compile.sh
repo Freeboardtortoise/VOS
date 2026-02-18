@@ -176,7 +176,7 @@ sudo mkdir -p mnt/tmp
 sudo cp -a src/passwd mnt/etc/passwd
 
 echo "installing busybox"
-if [ -f /bin/busybox ]; then
+if [ -f busybox/busybox ]; then
 	echo "busybox exists"
 else
 	echo "install busybox from your package manager to continue"
