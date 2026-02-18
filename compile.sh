@@ -201,6 +201,13 @@ echo "istalling vshell into the os"
 sudo cp build/working/vshell mnt/bin/vshell
 sudo chmod +x mnt/bin/vshell
 
+echo "installing vlogin into the OS"
+sudo cp build/working/vlogin mnt/bin/vlogin
+sudo chmod +x mnt/bin/vlogin
+
+echo "installing vpkg into the os"
+sudo cp build/working/vpkg mnt/bin/vpkg
+sudo chmod +x mnt/bin/vpkg
 
 # sudo chmod +x mnt/bin/g++
 

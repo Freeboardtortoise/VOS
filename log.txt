@@ -1,0 +1,216 @@
+src/V/vshell.v:26:8: warning: module 'term' is imported but never used. Use `import term as _`, to silence this warning, or just remove the unused import line
+   24 | 
+   25 | import os
+   26 | import term
+      |        ~~~~
+   27 | import time
+   28 | import sync
+src/V/vshell.v:123:2: warning: unused variable: `prompt`
+  121 |     mut done := false
+  122 |     // data
+  123 |     prompt := "Vshel user$ "
+      |     ~~~~~~
+  124 |     // input data
+  125 |     start_cursor_y := buffer.size().height - 2
+src/V/vshell.v:130:2: warning: unused variable: `last_command_len`
+  128 |     mut current_cursor_y := start_cursor_y
+  129 |     current_cursor_x = 1
+  130 |     last_command_len := 0
+      |     ~~~~~~~~~~~~~~~~
+  131 | 
+  132 |     mut current_command := ""
+src/V/vshell.v:25:8: error: A module `os` was already imported on line 19`.
+   23 | 
+   24 | 
+   25 | import os
+      |        ~~
+   26 | import term
+   27 | import time
+src/V/vshell.v:46:54: error: unknown type `sync.AtomicBool`
+   44 | 
+   45 | // Thread that continuously reads PTY master and writes to terminal
+   46 | fn stream_pty_to_tty(master_fd int, tty_fd int, done &sync.AtomicBool) {
+      |                                                      ~~~~~~~~~~~~~~~~
+   47 |     mut buf := []u8{len: 4096}
+   48 |     mut prev := u8(0)
+src/V/vshell.v:70:4: error: unknown function: C.openpty
+   68 |     mut slave_fd := 0
+   69 | 
+   70 |     C.openpty(&master_fd, &slave_fd, 0, 0, 0)
+      |       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   71 | 
+   72 |     pid := os.fork() or { panic('fork failed') }
+src/V/vshell.v:72:19: error: unexpected `or` block, the function `os.fork` does not return an Option or a Result
+   70 |     C.openpty(&master_fd, &slave_fd, 0, 0, 0)
+   71 | 
+   72 |     pid := os.fork() or { panic('fork failed') }
+      |                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   73 |     if pid == 0 {
+   74 |         // Child process
+src/V/vshell.v:75:6: error: unknown function: os.setsid .
+Did you mean `os.setenv`?
+   73 |     if pid == 0 {
+   74 |         // Child process
+   75 |         os.setsid() or {}
+      |            ~~~~~~~~
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+src/V/vshell.v:75:15: error: unexpected `or` block, the function `os.setsid` does not return an Option or a Result
+   73 |     if pid == 0 {
+   74 |         // Child process
+   75 |         os.setsid() or {}
+      |                     ~~~~~
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+src/V/vshell.v:76:6: error: unknown function: os.dup2 .
+Did you mean `os.fd_dup2`?
+   74 |         // Child process
+   75 |         os.setsid() or {}
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+      |            ~~~~~~~~~~~~~~~~~
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+src/V/vshell.v:76:24: error: unexpected `or` block, the function `os.dup2` does not return an Option or a Result
+   74 |         // Child process
+   75 |         os.setsid() or {}
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+      |                              ~~~~~
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+src/V/vshell.v:77:6: error: unknown function: os.dup2 .
+Did you mean `os.fd_dup2`?
+   75 |         os.setsid() or {}
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+      |            ~~~~~~~~~~~~~~~~~
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+   79 |         os.close(master_fd)
+src/V/vshell.v:77:24: error: unexpected `or` block, the function `os.dup2` does not return an Option or a Result
+   75 |         os.setsid() or {}
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+      |                              ~~~~~
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+   79 |         os.close(master_fd)
+src/V/vshell.v:78:6: error: unknown function: os.dup2 .
+Did you mean `os.fd_dup2`?
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+      |            ~~~~~~~~~~~~~~~~~
+   79 |         os.close(master_fd)
+   80 |         os.close(slave_fd)
+src/V/vshell.v:78:24: error: unexpected `or` block, the function `os.dup2` does not return an Option or a Result
+   76 |         os.dup2(slave_fd, 0) or {}  // stdin
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+      |                              ~~~~~
+   79 |         os.close(master_fd)
+   80 |         os.close(slave_fd)
+src/V/vshell.v:79:6: error: unknown function: os.close .
+Did you mean `os.fd_close`?
+   77 |         os.dup2(slave_fd, 1) or {}  // stdout
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+   79 |         os.close(master_fd)
+      |            ~~~~~~~~~~~~~~~~
+   80 |         os.close(slave_fd)
+   81 |
+src/V/vshell.v:80:6: error: unknown function: os.close .
+Did you mean `os.fd_close`?
+   78 |         os.dup2(slave_fd, 2) or {}  // stderr
+   79 |         os.close(master_fd)
+   80 |         os.close(slave_fd)
+      |            ~~~~~~~~~~~~~~~
+   81 | 
+   82 |         args := cmd.split(' ')
+src/V/vshell.v:88:5: error: unknown function: os.close .
+Did you mean `os.fd_close`?
+   86 | 
+   87 |     // Parent
+   88 |     os.close(slave_fd)
+      |        ~~~~~~~~~~~~~~~
+   89 |     return PtyProcess{
+   90 |         master_fd: master_fd
+src/V/vshell.v:99:19: error: unknown function: sync.new_atomic_bool .
+Did you mean `sync.stdatomic.new_atomic`?
+   97 |     proc := spawn_command(cmd)
+   98 | 
+   99 |     mut done := sync.new_atomic_bool(false)
+      |                      ~~~~~~~~~~~~~~~~~~~~~~
+  100 |     spawn stream_pty_to_tty(proc.master_fd, 1, &done) // 1 = stdout
+  101 |
+src/V/vshell.v:99:11: error: assignment mismatch: 1 variable but `sync.new_atomic_bool()` returns 0 values
+   97 |     proc := spawn_command(cmd)
+   98 | 
+   99 |     mut done := sync.new_atomic_bool(false)
+      |              ~~
+  100 |     spawn stream_pty_to_tty(proc.master_fd, 1, &done) // 1 = stdout
+  101 |
+src/V/vshell.v:100:45: error: cannot use `void` as `&sync.AtomicBool` in argument 3 to `stream_pty_to_tty`
+   98 | 
+   99 |     mut done := sync.new_atomic_bool(false)
+  100 |     spawn stream_pty_to_tty(proc.master_fd, 1, &done) // 1 = stdout
+      |                                                ~~~~~
+  101 | 
+  102 |     // Wait for child process
+src/V/vshell.v:103:5: error: unknown function: os.waitpid .
+Did you mean `os.wait`?
+  101 | 
+  102 |     // Wait for child process
+  103 |     os.waitpid(proc.child_pid, 0)
+      |        ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  104 |     done.set(true)
+  105 |
+src/V/vshell.v:107:7: error: unknown function: time.sleep_ms .
+Did you mean `time.sleep`?
+  105 | 
+  106 |     // Small sleep to flush remaining bytes
+  107 |     time.sleep_ms(50)
+      |          ~~~~~~~~~~~~
+  108 | }
+  109 |
+src/V/vshell.v:164:26: error: unknown function: sync.new_atomic_bool .
+Did you mean `sync.stdatomic.new_atomic`?
+  162 |                 proc := spawn_command(cmd)
+  163 | 
+  164 |                 mut complete := sync.new_atomic_bool(false)
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~
+  165 |                 spawn stream_pty_to_tty(proc.master_fd, 1, &complete) // 1 = stdout
+  166 |
+src/V/vshell.v:164:18: error: assignment mismatch: 1 variable but `sync.new_atomic_bool()` returns 0 values
+  162 |                 proc := spawn_command(cmd)
+  163 | 
+  164 |                 mut complete := sync.new_atomic_bool(false)
+      |                              ~~
+  165 |                 spawn stream_pty_to_tty(proc.master_fd, 1, &complete) // 1 = stdout
+  166 |
+src/V/vshell.v:165:48: error: cannot use `void` as `&sync.AtomicBool` in argument 3 to `stream_pty_to_tty`
+  163 | 
+  164 |                 mut complete := sync.new_atomic_bool(false)
+  165 |                 spawn stream_pty_to_tty(proc.master_fd, 1, &complete) // 1 = stdout
+      |                                                            ~~~~~~~~~
+  166 | 
+  167 |                 // Wait for child process
+src/V/vshell.v:168:8: error: unknown function: os.waitpid .
+Did you mean `os.wait`?
+  166 | 
+  167 |                 // Wait for child process
+  168 |                 os.waitpid(proc.child_pid, 0)
+      |                    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+  169 |                 complete.set(true)            // doing some shenanigans
+  170 |                 run_cmd_raw(current_command)
+src/V/vshell.v:170:5: error: unknown function: run_cmd_raw
+  168 |                 os.waitpid(proc.child_pid, 0)
+  169 |                 complete.set(true)            // doing some shenanigans
+  170 |                 run_cmd_raw(current_command)
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  171 |                 insert_mode = false
+  172 |                 current_command = ""
+src/V/vshell.v:110:1: error: function `main` is already defined
+  108 | }
+  109 | 
+  110 | fn main() {
+      | ~~~~~~~~~
+  111 | 
+  112 |     mut screen := vcurses.initialise()
+If the code of your project is in a folder with multiple .v files, try `v src/V` instead of `v src/V/vshell.v`

@@ -71,9 +71,8 @@ fn get_histroy(file_path string, index int) string{
 }
 fn get_history_len(file_path string) int {
 	mut len := 0
-	splitter := ":::::>>>>>"
 	history := os.read_lines(file_path) or {panic("error reading file")}
-	for line in history{
+	for _ in history{
 		len = len + 1
 	}
 	return len
@@ -94,7 +93,7 @@ fn main() {
 	history_file := "commands.txt"
 
 
-	cfg := load_config("src/V/config.json")
+	cfg := load_config("/home/user/.config/vshell/config.json")
 	mut screen := vcurses.initialise()
 	defer {
 		screen.clear()
@@ -106,15 +105,12 @@ fn main() {
 	mut insert_mode := false
 	mut history_mode := false
 	mut done := false
-	// data
-	prompt := "Vshel user$ "
 	// input data
 	start_cursor_y := buffer.size().height - 2
 	output_cursor_y := 5
 	mut current_cursor_x := 0
 	mut current_cursor_y := start_cursor_y
 	current_cursor_x = 1
-	last_command_len := 0
 	mut current_history_intent := 0
 
 	if cfg.tutorial == true {
